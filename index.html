@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>プログラミング教室アクシオ管理システム</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: linear-gradient(
+          180deg,
+           #ffd9ec,
+           #ead8ff
+      );
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1 {
+  background: linear-gradient(
+    90deg,
+    #d291ff,
+    #f5b6d3
+  );
+
+  color: white;
+
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+    section {
+      background: #fffafd;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 12px;
+      box-shadow: 0 0 6px #ddd;
+    }
+
+    input, select, textarea, button {
+      font-size: 16px;
+      margin: 5px 0;
+      padding: 8px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #e98fbd;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .card {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      background: #fffafd;
+      border-left: 6px solid #d291ff;
+    }
+
+    .notice {
+      background: #fff3cd;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    button:hover {
+  opacity: 0.85;
+}
+
+button.danger {
+  background: #d9534f;
+}
+
+button.edit {
+  background: #ff6b8a;
+}
+
+button.save {
+  background: #c78cff;
+}
+
+textarea {
+  min-height: 80px;
+}
+
+.card h3 {
+  margin-top: 0;
+  color: #b84f8a;
+}
+
+hr {
+  border: none;
+  border-top: 1px dashed #e8b6cf;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid #d291ff;
+}
+  </style>
+</head>
+
+<body>
+
+  <h1>プログラミング教室アクシオ<br>管理システム</h1>
+
+  <section>
+  <h2>🏠 Accioダッシュボード</h2>
+
+  <button onclick="showDashboard()">
+    ダッシュボードを表示
+  </button>
+
+  <div id="dashboard"></div>
+</section>
+
+  <section>
+    <h2>大切な引継ぎ情報</h2>
+    <div class="notice">
+      住所・電話番号・生年月日・フルネームなどの個人情報は、USB内の「生徒基本情報」を確認してください。<br>
+      このアプリには、教室運営に必要な情報のみ記録します。
+    </div>
+  </section>
+
+  <section>
+    <h2>生徒登録</h2>
+    <input id="studentName" placeholder="表示名 例：R君">
+    <input id="grade" placeholder="学年 例：中2">
+    <input id="course" placeholder="受講コース 例：Roblox">
+    <input id="fee" placeholder="受講料 例：8800">
+    <input id="payment" placeholder="支払い方法 例：現金">
+    <input id="license" placeholder="取得資格 例：タイピング3級">
+    <textarea id="supportMemo" placeholder="指導ポイント・引継ぎメモ"></textarea>
+    <button onclick="addStudent()">生徒を登録</button>
+  </section>
+
+  <section>
+    <h2>生徒を選択</h2>
+    <input
+  type="text"
+  id="studentSearch"
+  placeholder="生徒名で検索"
+  onkeyup="searchStudents()"
+>
+    <select id="studentSelect" onchange="showStudentInfo()">
+      <option value="">生徒を選んでください</option>
+    </select>
+
+    <div id="studentInfo"></div>
+  </section>
+
+  <section>
+  <h2>生徒別サマリー</h2>
+  <button onclick="showStudentSummary()">選択中の生徒サマリーを表示</button>
+  <div id="studentSummary"></div>
+</section>
+
+<section>
+  <h2>引継ぎレポート</h2>
+
+  <button onclick="showHandoverReport()">
+    引継ぎレポート作成
+  </button>
+
+  <div id="handoverReport"></div>
+</section>
+
+  <section>
+    <h2>日報入力</h2>
+    <input type="date" id="reportDate">
+    <select id="status">
+      <option value="受講">受講</option>
+      <option value="欠席">欠席</option>
+      <option value="振替">振替</option>
+    </select>
+    <textarea id="reportText" placeholder="今日の学習内容・様子"></textarea>
+    <textarea id="nextPlan" placeholder="次回やること"></textarea>
+    <label>
+      <input type="checkbox" id="paid" style="width:auto;">
+      本日、受講料の支払いあり
+    </label>
+    <button onclick="addReport()">日報を保存</button>
+  </section>
+
+  <section>
+    <h2>最近の日報</h2>
+    <div id="reportList"></div>
+  </section>
+
+  <section>
+  <h2>バックアップ</h2>
+  <button onclick="downloadBackup()">バックアップを保存</button>
+
+  <input type="file" id="backupFile" accept=".json">
+  <button onclick="loadBackup()">バックアップを読み込む</button>
+</section>
+
+<section>
+  <h2>次回予定一覧</h2>
+  <button onclick="showNextPlans()">次回予定を表示</button>
+  <div id="nextPlanList"></div>
+</section>
+
+<section>
+  <h2>本日の状況</h2>
+
+  <button onclick="showTodaySummary()">
+    本日の状況を表示
+  </button>
+
+  <div id="todaySummary"></div>
+</section>
+
+<section>
+  <h2>月別集計</h2>
+  <input type="month" id="summaryMonth">
+  <button onclick="showMonthlySummary()">月別集計を表示</button>
+  <div id="monthlySummary"></div>
+</section>
+
+<section>
+  <h2>月別支払い状況</h2>
+
+  <input type="month" id="paymentMonth">
+
+  <button onclick="showMonthlyPayments()">
+    支払い状況を表示
+  </button>
+
+  <div id="monthlyPaymentResult"></div>
+</section>
+
+<section>
+  <h2>教室全体メモ</h2>
+
+  <textarea
+    id="schoolMemo"
+    rows="10"
+    placeholder="Roblox公開ルール、教材保存場所、保護者対応方法など"
+  ></textarea>
+
+  <button onclick="saveSchoolMemo()">
+    教室メモを保存
+  </button>
+
+</section>
+
+
+  <script>
+    let students = JSON.parse(localStorage.getItem("students")) || [];
+    let reports = JSON.parse(localStorage.getItem("reports")) || [];
+
+    function getTodayString() {
+  const today = new Date();
+
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function getCurrentMonthString() {
+  return getTodayString().slice(0, 7);
+}
+
+    document.getElementById("reportDate").valueAsDate = new Date();
+    document.getElementById("summaryMonth").value = new Date().toISOString().slice(0, 7);
+    document.getElementById("paymentMonth").value =new Date().toISOString().slice(0, 7);
+
+    function saveData() {
+      localStorage.setItem("students", JSON.stringify(students));
+      localStorage.setItem("reports", JSON.stringify(reports));
+    }
+
+    function addStudent() {
+    const student = {
+    id: Date.now(),
+    name: document.getElementById("studentName").value,
+    grade: document.getElementById("grade").value,
+    course: document.getElementById("course").value,
+    fee: document.getElementById("fee").value,
+    payment: document.getElementById("payment").value,
+    license: document.getElementById("license").value,
+    supportMemo: document.getElementById("supportMemo").value
+  };
+
+  if (!student.name) {
+    alert("表示名を入力してください");
+    return;
+  }
+
+  const exists = students.some(s => s.name === student.name);
+
+  if (exists) {
+    alert("同じ表示名の生徒がすでに登録されています");
+    return;
+  }
+
+  students.push(student);
+  saveData();
+  updateStudentSelect();
+
+  document.getElementById("studentName").value = "";
+  document.getElementById("grade").value = "";
+  document.getElementById("course").value = "";
+  document.getElementById("fee").value = "";
+  document.getElementById("payment").value = "";
+  document.getElementById("license").value = "";
+  document.getElementById("supportMemo").value = "";
+
+  alert("生徒を登録しました！");
+}
+
+    function updateStudentSelect() {
+      const select = document.getElementById("studentSelect");
+      select.innerHTML = '<option value="">生徒を選んでください</option>';
+
+      students.forEach(student => {
+        const option = document.createElement("option");
+        option.value = student.id;
+        option.textContent = student.name;
+        select.appendChild(option);
+      });
+    }
+
+    function showStudentInfo() {
+      const id = Number(document.getElementById("studentSelect").value);
+      const student = students.find(s => s.id === id);
+
+      if (!student) {
+        document.getElementById("studentInfo").innerHTML = "";
+        document.getElementById("reportList").innerHTML = "";
+        return;
+      }
+
+      document.getElementById("studentInfo").innerHTML = `
+        <div class="card">
+          <h3>${student.name}</h3>
+          <p>学年：${student.grade}</p>
+          <p>受講コース：${student.course}</p>
+          <p>受講料：${student.fee}円</p>
+          <p>支払い方法：${student.payment}</p>
+          <p>取得資格：${student.license}</p>
+          <p>指導ポイント：<br>${student.supportMemo}</p>
+          <button onclick="deleteStudent(${student.id})">この生徒を削除</button>
+          <button onclick="showEditStudentForm(${student.id})">この生徒を編集</button>
+        </div>
+        
+    
+      `;
+
+      showReports(id);
+    }
+
+    function addReport() {
+      const studentId = Number(document.getElementById("studentSelect").value);
+
+      if (!studentId) {
+        alert("先に生徒を選んでください");
+        return;
+      }
+
+      const report = {
+        id: Date.now(),
+        studentId: studentId,
+        date: document.getElementById("reportDate").value,
+        status: document.getElementById("status").value,
+        text: document.getElementById("reportText").value,
+        nextPlan: document.getElementById("nextPlan").value,
+        paid: document.getElementById("paid").checked
+      };
+
+      reports.push(report);
+      saveData();
+
+      document.getElementById("reportText").value = "";
+      document.getElementById("nextPlan").value = "";
+      document.getElementById("paid").checked = false;
+
+      showReports(studentId);
+      alert("日報を保存しました！");
+    }
+
+    function showReports(studentId) {
+      const list = document.getElementById("reportList");
+      const studentReports = reports
+        .filter(r => r.studentId === studentId)
+        .sort((a, b) => b.date.localeCompare(a.date));
+
+      list.innerHTML = "";
+
+      if (studentReports.length === 0) {
+        list.innerHTML = "まだ日報はありません。";
+        return;
+      }
+
+      studentReports.forEach(report => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <p><strong>${report.date}</strong>　${report.status}</p>
+          <p>内容：<br>${report.text}</p>
+          <p>次回予定：<br>${report.nextPlan}</p>
+          <p>支払い：${report.paid ? "済" : "未"}</p>
+          <button onclick="editReport(${report.id})">編集</button>
+          <button onclick="deleteReport(${report.id})">削除</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function deleteReport(reportId) {
+        
+      if (!confirm("この日報を削除していいですか？")) return;
+
+      reports = reports.filter(r => r.id !== reportId);
+      saveData();
+
+      const studentId = Number(document.getElementById("studentSelect").value);
+      showReports(studentId);
+    }
+
+    function editReport(reportId) {
+
+  const report = reports.find(
+    r => r.id === reportId
+  );
+
+  if (!report) {
+    alert("日報が見つかりません");
+    return;
+  }
+
+  const newText = prompt(
+    "日報内容を編集",
+    report.text
+  );
+
+  if (newText === null) {
+    return;
+  }
+
+  const newNextPlan = prompt(
+    "次回予定を編集",
+    report.nextPlan
+  );
+
+  if (newNextPlan === null) {
+    return;
+  }
+
+  report.text = newText;
+  report.nextPlan = newNextPlan;
+
+  saveData();
+
+  const studentId = Number(
+    document.getElementById("studentSelect").value
+  );
+
+  showReports(studentId);
+
+  alert("日報を更新しました！");
+}
+
+    function deleteStudent(studentId) {
+  if (!confirm("この生徒を削除していいですか？この生徒の日報も一緒に削除されます。")) return;
+
+  students = students.filter(s => s.id !== studentId);
+  reports = reports.filter(r => r.studentId !== studentId);
+
+  saveData();
+  updateStudentSelect();
+
+  document.getElementById("studentInfo").innerHTML = "";
+  document.getElementById("reportList").innerHTML = "";
+
+  alert("生徒を削除しました！");
+}
+
+function showEditStudentForm(studentId) {
+  const student = students.find(s => s.id === studentId);
+
+  if (!student) {
+    alert("生徒情報が見つかりません");
+    return;
+  }
+
+  document.getElementById("studentInfo").innerHTML = `
+    <div class="card">
+      <h3>${student.name} の編集</h3>
+
+      <input id="editName" value="${student.name}">
+      <input id="editGrade" value="${student.grade}">
+      <input id="editCourse" value="${student.course}">
+      <input id="editFee" value="${student.fee}">
+      <input id="editPayment" value="${student.payment}">
+      <input id="editLicense" value="${student.license}">
+      <textarea id="editSupportMemo">${student.supportMemo}</textarea>
+
+      <button onclick="saveStudentEdit(${student.id})">編集内容を保存</button>
+      <button onclick="showStudentInfo()">キャンセル</button>
+    </div>
+  `;
+}
+
+function saveStudentEdit(studentId) {
+  const student = students.find(s => s.id === studentId);
+
+  if (!student) {
+    alert("生徒情報が見つかりません");
+    return;
+  }
+
+  const newName = document.getElementById("editName").value;
+
+  if (!newName) {
+    alert("表示名を入力してください");
+    return;
+  }
+
+  const exists = students.some(s => s.name === newName && s.id !== studentId);
+
+  if (exists) {
+    alert("同じ表示名の生徒がすでに登録されています");
+    return;
+  }
+
+  student.name = newName;
+  student.grade = document.getElementById("editGrade").value;
+  student.course = document.getElementById("editCourse").value;
+  student.fee = document.getElementById("editFee").value;
+  student.payment = document.getElementById("editPayment").value;
+  student.license = document.getElementById("editLicense").value;
+  student.supportMemo = document.getElementById("editSupportMemo").value;
+
+  saveData();
+  updateStudentSelect();
+
+  document.getElementById("studentSelect").value = studentId;
+  showStudentInfo();
+
+  alert("生徒情報を更新しました！");
+}
+
+function downloadBackup() {
+  const backupData = {
+    students: students,
+    reports: reports,
+    savedAt: new Date().toLocaleString("ja-JP")
+  };
+
+  const json = JSON.stringify(backupData, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+
+  const today = getTodayString();
+  a.download = `axio_backup_${today}.json`;
+
+  a.click();
+
+  URL.revokeObjectURL(url);
+
+  alert("バックアップを保存しました！");
+}
+
+function loadBackup() {
+  const fileInput = document.getElementById("backupFile");
+  const file = fileInput.files[0];
+
+  if (!file) {
+    alert("読み込むバックアップファイルを選んでください");
+    return;
+  }
+
+  if (!confirm("今のデータをバックアップ内容で上書きします。よろしいですか？")) {
+    return;
+  }
+
+
+  const reader = new FileReader();
+
+  reader.onload = function(event) {
+    try {
+      const backupData = JSON.parse(event.target.result);
+
+      if (!backupData.students || !backupData.reports) {
+        alert("バックアップファイルの形式が違うみたいです");
+        return;
+      }
+
+      students = backupData.students;
+      reports = backupData.reports;
+
+      saveData();
+      updateStudentSelect();
+
+      document.getElementById("studentInfo").innerHTML = "";
+      document.getElementById("reportList").innerHTML = "";
+      document.getElementById("backupFile").value = "";
+
+      alert("バックアップを読み込みました！");
+    } catch (error) {
+      alert("読み込みに失敗しました");
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+function showNextPlans() {
+  const list = document.getElementById("nextPlanList");
+  list.innerHTML = "";
+
+  const selectedStudentId = Number(
+    document.getElementById("studentSelect").value
+  );
+
+  if (!selectedStudentId) {
+    alert("先に生徒を選んでください");
+    return;
+  }
+
+  const student = students.find(s => s.id === selectedStudentId);
+
+  if (!student) {
+    list.innerHTML = "生徒情報が見つかりません。";
+    return;
+  }
+
+  const studentReports = reports
+    .filter(r => r.studentId === selectedStudentId)
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  const latestReport = studentReports[0];
+
+  const div = document.createElement("div");
+  div.className = "card";
+
+  if (latestReport) {
+    div.innerHTML = `
+      <h3>${student.name}</h3>
+      <p>学年：${student.grade}</p>
+      <p>コース：${student.course}</p>
+      <p>最新日報：${latestReport.date} / ${latestReport.status}</p>
+      <p>次回予定：<br>${latestReport.nextPlan || "未記入"}</p>
+    `;
+  } else {
+    div.innerHTML = `
+      <h3>${student.name}</h3>
+      <p>学年：${student.grade}</p>
+      <p>コース：${student.course}</p>
+      <p>日報はまだありません。</p>
+    `;
+  }
+
+  list.appendChild(div);
+}
+
+function showMonthlySummary() {
+  const month = document.getElementById("summaryMonth").value;
+  const result = document.getElementById("monthlySummary");
+
+  if (!month) {
+    alert("集計する月を選んでください");
+    return;
+  }
+
+  const monthlyReports = reports.filter(r => r.date.startsWith(month));
+
+  const attendCount = monthlyReports.filter(r => r.status === "受講").length;
+  const absentCount = monthlyReports.filter(r => r.status === "欠席").length;
+  const transferCount = monthlyReports.filter(r => r.status === "振替").length;
+  const paidCount = monthlyReports.filter(r => r.paid).length;
+
+  result.innerHTML = `
+    <div class="card">
+      <h3>${month} の集計</h3>
+      <p>受講：${attendCount} 回</p>
+      <p>欠席：${absentCount} 回</p>
+      <p>振替：${transferCount} 回</p>
+      <p>支払いチェックあり：${paidCount} 件</p>
+    </div>
+  `;
+}
+
+function showTodaySummary() {
+
+  const today = getTodayString();
+
+  const todayReports = reports.filter(
+    r => r.date === today
+  );
+
+  const attendCount = todayReports.filter(
+    r => r.status === "受講"
+  ).length;
+
+  const absentCount = todayReports.filter(
+    r => r.status === "欠席"
+  ).length;
+
+  const transferCount = todayReports.filter(
+    r => r.status === "振替"
+  ).length;
+
+  const attendNames = todayReports
+    .filter(r => r.status === "受講")
+    .map(r => {
+      const student = students.find(
+        s => s.id === r.studentId
+      );
+      return student ? student.name : "";
+    });
+
+  const absentNames = todayReports
+    .filter(r => r.status === "欠席")
+    .map(r => {
+      const student = students.find(
+        s => s.id === r.studentId
+      );
+      return student ? student.name : "";
+    });
+
+  const transferNames = todayReports
+    .filter(r => r.status === "振替")
+    .map(r => {
+      const student = students.find(
+        s => s.id === r.studentId
+      );
+      return student ? student.name : "";
+    });
+
+  document.getElementById("todaySummary").innerHTML = `
+    <div class="card">
+
+      <h3>${today}</h3>
+
+      <p>
+        本日受講者数：
+        ${attendCount} 名
+      </p>
+
+      <p>
+        受講者：
+        ${attendNames.join("、") || "なし"}
+      </p>
+
+      <hr>
+
+      <p>
+        本日欠席者数：
+        ${absentCount} 名
+      </p>
+
+      <p>
+        欠席者：
+        ${absentNames.join("、") || "なし"}
+      </p>
+
+      <hr>
+
+      <p>
+        本日振替者数：
+        ${transferCount} 名
+      </p>
+
+      <p>
+        振替者：
+        ${transferNames.join("、") || "なし"}
+      </p>
+
+    </div>
+  `;
+}
+
+function showStudentSummary() {
+  const studentId = Number(document.getElementById("studentSelect").value);
+  const result = document.getElementById("studentSummary");
+
+  if (!studentId) {
+    alert("先に生徒を選んでください");
+    return;
+  }
+
+  const student = students.find(s => s.id === studentId);
+
+  if (!student) {
+    result.innerHTML = "生徒情報が見つかりません。";
+    return;
+  }
+
+  const studentReports = reports
+    .filter(r => r.studentId === studentId)
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  const attendCount = studentReports.filter(r => r.status === "受講").length;
+  const absentCount = studentReports.filter(r => r.status === "欠席").length;
+  const transferCount = studentReports.filter(r => r.status === "振替").length;
+
+  const latestReport = studentReports[0];
+
+  result.innerHTML = `
+    <div class="card">
+      <h3>${student.name} のサマリー</h3>
+
+      <p>学年：${student.grade}</p>
+      <p>受講コース：${student.course}</p>
+      <p>受講料：${student.fee}円</p>
+      <p>支払い方法：${student.payment}</p>
+      <p>取得資格：${student.license}</p>
+
+      <hr>
+
+      <p>受講回数：${attendCount} 回</p>
+      <p>欠席回数：${absentCount} 回</p>
+      <p>振替回数：${transferCount} 回</p>
+
+      <hr>
+
+      <p>指導ポイント：<br>${student.supportMemo || "未記入"}</p>
+
+      <hr>
+
+      <p>最新日報：<br>${latestReport ? latestReport.text : "まだ日報はありません"}</p>
+      <p>次回予定：<br>${latestReport ? latestReport.nextPlan || "未記入" : "まだ日報はありません"}</p>
+    </div>
+  `;
+}
+
+function showHandoverReport() {
+
+  const studentId =
+    Number(
+      document.getElementById(
+        "studentSelect"
+      ).value
+    );
+
+  if (!studentId) {
+    alert("先に生徒を選んでください");
+    return;
+  }
+
+  const student =
+    students.find(
+      s => s.id === studentId
+    );
+
+  if (!student) {
+    return;
+  }
+
+  const studentReports =
+    reports
+      .filter(
+        r => r.studentId === studentId
+      )
+      .sort(
+        (a, b) =>
+          b.date.localeCompare(a.date)
+      );
+
+  const attendCount =
+    studentReports.filter(
+      r => r.status === "受講"
+    ).length;
+
+  const absentCount =
+    studentReports.filter(
+      r => r.status === "欠席"
+    ).length;
+
+  const transferCount =
+    studentReports.filter(
+      r => r.status === "振替"
+    ).length;
+
+  const latestReport =
+    studentReports[0];
+
+  document.getElementById(
+    "handoverReport"
+  ).innerHTML = `
+    <div class="card">
+
+      <h2>
+        ${student.name}
+      </h2>
+
+      <p>
+        学年：
+        ${student.grade}
+      </p>
+
+      <p>
+        受講コース：
+        ${student.course}
+      </p>
+
+      <p>
+        受講料：
+        ${student.fee}円
+      </p>
+
+      <p>
+        支払い方法：
+        ${student.payment}
+      </p>
+
+      <p>
+        取得資格：
+        ${student.license}
+      </p>
+
+      <hr>
+
+      <p>
+        受講回数：
+        ${attendCount}回
+      </p>
+
+      <p>
+        欠席回数：
+        ${absentCount}回
+      </p>
+
+      <p>
+        振替回数：
+        ${transferCount}回
+      </p>
+
+      <hr>
+
+      <p>
+        指導ポイント
+      </p>
+
+      <p>
+        ${student.supportMemo || "未記入"}
+      </p>
+
+      <hr>
+
+      <p>
+        最新日報
+      </p>
+
+      <p>
+        ${
+          latestReport
+          ? latestReport.text
+          : "なし"
+        }
+      </p>
+
+      <hr>
+
+      <p>
+        次回予定
+      </p>
+
+      <p>
+        ${
+          latestReport
+          ? latestReport.nextPlan
+          : "なし"
+        }
+      </p>
+
+    </div>
+  `;
+}
+
+function showMonthlyPayments() {
+
+  const month =
+    document.getElementById("paymentMonth").value;
+
+  if (!month) {
+    alert("月を選んでください");
+    return;
+  }
+
+  const paidStudents = [];
+  const unpaidStudents = [];
+
+  students.forEach(student => {
+
+    const monthReports =
+      reports.filter(r =>
+        r.studentId === student.id &&
+        r.date.startsWith(month)
+      );
+
+    const paid =
+      monthReports.some(r => r.paid);
+
+    if (paid) {
+      paidStudents.push(student.name);
+    } else {
+      unpaidStudents.push(student.name);
+    }
+
+  });
+
+  document.getElementById(
+    "monthlyPaymentResult"
+  ).innerHTML = `
+    <div class="card">
+
+      <h3>${month} 支払い状況</h3>
+
+      <p>
+        🟢 支払い済
+      </p>
+
+      <p>
+        ${paidStudents.join("、") || "なし"}
+      </p>
+
+      <hr>
+
+      <p>
+        🔴 未払い
+      </p>
+
+      <p>
+        ${unpaidStudents.join("、") || "なし"}
+      </p>
+
+    </div>
+  `;
+}
+
+function saveSchoolMemo() {
+
+  const memo =
+    document.getElementById("schoolMemo").value;
+
+  localStorage.setItem(
+    "schoolMemo",
+    memo
+  );
+
+  alert("教室メモを保存しました！");
+}
+
+function searchStudents() {
+
+  const keyword =
+    document.getElementById("studentSearch")
+      .value
+      .toLowerCase();
+
+  const select =
+    document.getElementById("studentSelect");
+
+  select.innerHTML =
+    '<option value="">生徒を選んでください</option>';
+
+  students
+    .filter(student =>
+      student.name
+        .toLowerCase()
+        .includes(keyword)
+    )
+    .forEach(student => {
+
+      const option =
+        document.createElement("option");
+
+      option.value = student.id;
+      option.textContent = student.name;
+
+      select.appendChild(option);
+
+    });
+}
+
+const savedMemo =
+  localStorage.getItem("schoolMemo");
+
+if (savedMemo) {
+  document.getElementById("schoolMemo").value =
+    savedMemo;
+}
+
+
+function showDashboard() {
+
+  const today =
+     getTodayString();
+
+  const todayReports =
+    reports.filter(r => r.date === today);
+
+  const attend =
+    todayReports.filter(
+      r => r.status === "受講"
+    ).length;
+
+  const absent =
+    todayReports.filter(
+      r => r.status === "欠席"
+    ).length;
+
+  const transfer =
+    todayReports.filter(
+      r => r.status === "振替"
+    ).length;
+
+  const currentMonth =
+    new Date().toISOString().slice(0, 7);
+
+  const unpaidStudents = [];
+
+  students.forEach(student => {
+
+    const monthReports =
+      reports.filter(r =>
+        r.studentId === student.id &&
+        r.date.startsWith(currentMonth)
+      );
+
+    const paid =
+      monthReports.some(
+        r => r.paid
+      );
+
+    if (!paid) {
+      unpaidStudents.push(student.name);
+    }
+
+  });
+
+  const nextPlans = [];
+
+  students.forEach(student => {
+
+    const studentReports =
+      reports
+        .filter(
+          r => r.studentId === student.id
+        )
+        .sort(
+          (a,b) =>
+          b.date.localeCompare(a.date)
+        );
+
+    const latest =
+      studentReports[0];
+
+    if (
+      latest &&
+      latest.nextPlan
+    ) {
+      nextPlans.push(
+        `${student.name}：${latest.nextPlan}`
+      );
+    }
+
+  });
+
+  document.getElementById(
+    "dashboard"
+  ).innerHTML = `
+    <div class="card">
+
+      <h3>本日の状況</h3>
+
+      <p>
+        受講：
+        ${attend} 名
+      </p>
+
+      <p>
+        欠席：
+        ${absent} 名
+      </p>
+
+      <p>
+        振替：
+        ${transfer} 名
+      </p>
+
+      <hr>
+
+      <h3>未払い一覧</h3>
+
+      <p>
+        ${
+          unpaidStudents.join("<br>")
+          || "なし"
+        }
+      </p>
+
+      <hr>
+
+      <h3>次回予定一覧</h3>
+
+      <p>
+        ${
+          nextPlans.join("<br>")
+          || "なし"
+        }
+      </p>
+
+    </div>
+  `;
+}
+
+    updateStudentSelect();
+    showDashboard();
+  </script>
+</body>
+</html>
