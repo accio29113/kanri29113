@@ -105,6 +105,42 @@ select:focus,
 textarea:focus {
   outline: 3px solid #d291ff;
 }
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.calendar-day {
+  background: white;
+  border-radius: 8px;
+  padding: 8px;
+  min-height: 45px;
+  border: 1px solid #eee;
+  text-align: center;
+}
+
+.calendar-day.attend {
+  background: #e6d8ff;
+  border: 2px solid #9c6bff;
+}
+
+.calendar-day.absent {
+  background: #ffe0e8;
+  border: 2px solid #ff6b8a;
+}
+
+.calendar-day.transfer {
+  background: #fff1c7;
+  border: 2px solid #e0a800;
+}
+
+.calendar-label {
+  font-size: 12px;
+  display: block;
+}
+
   </style>
 </head>
 
@@ -170,6 +206,12 @@ textarea:focus {
   <h2>生徒別サマリー</h2>
   <button onclick="showStudentSummary()">選択中の生徒サマリーを表示</button>
   <div id="studentSummary"></div>
+</section>
+
+<section>
+  <h2>受講カレンダー</h2>
+  <button onclick="showStudentCalendar()">選択中の生徒カレンダーを表示</button>
+  <div id="studentCalendar"></div>
 </section>
 
 <section>
@@ -1244,6 +1286,69 @@ function showDashboard() {
 
     </div>
   `;
+}
+
+function showStudentCalendar() {
+  const studentId = Number(document.getElementById("studentSelect").value);
+  const result = document.getElementById("studentCalendar");
+
+  if (!studentId) {
+    alert("先に生徒を選んでください");
+    return;
+  }
+
+  const month = document.getElementById("summaryMonth").value || getCurrentMonthString();
+
+  const studentReports = reports.filter(r =>
+    r.studentId === studentId &&
+    r.date.startsWith(month)
+  );
+
+  const year = Number(month.split("-")[0]);
+  const monthIndex = Number(month.split("-")[1]) - 1;
+  const lastDay = new Date(year, monthIndex + 1, 0).getDate();
+
+  let html = `
+    <div class="card">
+      <h3>${month} の受講カレンダー</h3>
+      <p>紫：受講　ピンク：欠席　黄色：振替</p>
+      <div class="calendar-grid">
+  `;
+
+  for (let day = 1; day <= lastDay; day++) {
+    const dateText = `${month}-${String(day).padStart(2, "0")}`;
+    const report = studentReports.find(r => r.date === dateText);
+
+    let className = "calendar-day";
+    let label = "";
+
+    if (report) {
+      if (report.status === "受講") {
+        className += " attend";
+        label = "受講";
+      } else if (report.status === "欠席") {
+        className += " absent";
+        label = "欠席";
+      } else if (report.status === "振替") {
+        className += " transfer";
+        label = "振替";
+      }
+    }
+
+    html += `
+      <div class="${className}">
+        ${day}
+        <span class="calendar-label">${label}</span>
+      </div>
+    `;
+  }
+
+  html += `
+      </div>
+    </div>
+  `;
+
+  result.innerHTML = html;
 }
 
     updateStudentSelect();
