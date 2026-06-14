@@ -16,6 +16,15 @@
       color: #333;
     }
 
+    <div id="loginScreen">
+  <h1>🔐 アクシオ教室管理システム</h1>
+  <p>パスワードを入力してください</p>
+  <input type="password" id="passwordInput" placeholder="パスワード">
+  <button onclick="login()">ログイン</button>
+</div>
+
+<div id="appScreen" style="display:none;">
+
     h1 {
   background: linear-gradient(
     90deg,
@@ -254,6 +263,18 @@ textarea:focus {
 
 
   <script>
+    const APP_PASSWORD = "aqua8739";
+
+function login() {
+  const input = document.getElementById("passwordInput").value;
+
+  if (input === APP_PASSWORD) {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("appScreen").style.display = "block";
+  } else {
+    alert("パスワードが違います");
+  }
+}
     let students = JSON.parse(localStorage.getItem("students")) || [];
     let reports = JSON.parse(localStorage.getItem("reports")) || [];
 
@@ -1224,5 +1245,6 @@ function showDashboard() {
     updateStudentSelect();
     showDashboard();
   </script>
+  </div>
 </body>
 </html>
