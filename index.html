@@ -294,9 +294,8 @@ function getCurrentMonthString() {
 }
 
     document.getElementById("reportDate").valueAsDate = new Date();
-    document.getElementById("summaryMonth").value = new Date().toISOString().slice(0, 7);
-    document.getElementById("paymentMonth").value =new Date().toISOString().slice(0, 7);
-
+    document.getElementById("summaryMonth").value =getCurrentMonthString();
+    document.getElementById("paymentMonth").value =getCurrentMonthString();
     function saveData() {
       localStorage.setItem("students", JSON.stringify(students));
       localStorage.setItem("reports", JSON.stringify(reports));
