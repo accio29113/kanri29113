@@ -576,6 +576,7 @@ function downloadBackup() {
   const backupData = {
     students: students,
     reports: reports,
+    schoolMemo: localStorage.getItem("schoolMemo") || "",
     savedAt: new Date().toLocaleString("ja-JP")
   };
 
@@ -623,6 +624,9 @@ function loadBackup() {
 
       students = backupData.students;
       reports = backupData.reports;
+
+      localStorage.setItem("schoolMemo", backupData.schoolMemo || "");
+      document.getElementById("schoolMemo").value = backupData.schoolMemo || "";
 
       saveData();
       updateStudentSelect();
